@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.sombrainc.p2p.util.Constant;
+
 public class ServerActions implements Runnable {
 
 	private Socket socket;
@@ -20,10 +22,10 @@ public class ServerActions implements Runnable {
 
 	@Override
 	public void run() {
-		try (ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());) {
-			final String action = ois.readUTF();
-			if ("download".equals(action)) {
-				downloadAction(ois);
+		try (ObjectInputStream input = new ObjectInputStream(socket.getInputStream());) {
+			final String action = input.readUTF();
+			if (Constant.DOWNLOAD.equals(action)) {
+				downloadAction(input);
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
@@ -42,6 +44,11 @@ public class ServerActions implements Runnable {
 		final InputStream fis = new FileInputStream(file);
 		try (final OutputStream sout = socket.getOutputStream(); final BufferedInputStream bis = new BufferedInputStream(fis);) {
 			final ObjectOutputStream out = new ObjectOutputStream(sout);
+			if (file.length() > Integer.MAX_VALUE) {
+				out.writeUTF("Pls choose < 4Gb file");
+			} else {
+				out.writeUTF("download");
+			}
 			out.writeInt((int) file.length());
 			out.flush();
 			final byte[] mybytearray = new byte[(int) file.length()];

@@ -1,4 +1,4 @@
-package com.sombrainc.p2p.command.impl;
+package com.sombrainc.p2p.service.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -9,32 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sombrainc.p2p.Client;
-import com.sombrainc.p2p.command.Command;
-import com.sombrainc.p2p.util.CustomScanner;
+import com.sombrainc.p2p.service.Service;
+import com.sombrainc.p2p.util.Constant;
 
-public class AddCommand extends Command {
+public class AddService extends Service {
 
 	@Override
 	public void execute() throws IOException {
-		String reason = "add";
 
-		String line;
 		List<String> files = new ArrayList<>();
-		int i = 0;
 		System.out.println("Input file names:");
 		System.out.println("Input 'done' to complete file names input");
 		while (true) {
-			line = CustomScanner.scanner.nextLine();
+			String line = Client.scanner.nextLine();
 			if (line.equals("done")) {
 				break;
 			}
 			files.add(line);
-			i++;
 		}
-		try (Socket socket = new Socket(Client.SERVERIP, Client.PORT)) {
+		try (Socket socket = new Socket(Constant.SERVERIP, Constant.SERVERPORT)) {
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-			out.writeUTF(reason);
+			out.writeUTF(Constant.ADD);
 			out.flush();
 			out.writeUTF(InetAddress.getLocalHost().getHostAddress().toString());
 			out.writeObject(files.toArray(new String[0]));

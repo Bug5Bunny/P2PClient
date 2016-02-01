@@ -1,4 +1,4 @@
-package com.sombrainc.p2p.command.impl;
+package com.sombrainc.p2p.service.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -10,25 +10,24 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-import com.sombrainc.p2p.command.Command;
-import com.sombrainc.p2p.util.CustomScanner;
+import com.sombrainc.p2p.Client;
+import com.sombrainc.p2p.service.Service;
+import com.sombrainc.p2p.util.Constant;
 
-public class DownloadFileCommand extends Command {
-	private static final int PORT = 6666;
+public class DownloadFileService extends Service {
 
 	@Override
 	public void execute() {
 
 		try {
 			String[] ipAddresses = new String[0];
-			String fileName = CustomScanner.scanner.nextLine();
-			try (final Socket socket = new Socket("127.0.0.1", PORT);) {
-
-				final ObjectOutputStream dos = new ObjectOutputStream(socket.getOutputStream());
-				dos.writeUTF("findFile");
-				dos.flush();
-				dos.writeUTF(fileName);
-				dos.flush();
+			String fileName = Client.scanner.nextLine();
+			try (final Socket socket = new Socket(Constant.SERVERIP, Constant.SERVERPORT);) {
+				final ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+				output.writeUTF(Constant.FINDFILE);
+				output.flush();
+				output.writeUTF(fileName);
+				output.flush();
 				final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 				ipAddresses = (String[]) inputStream.readObject();
 			}
@@ -43,7 +42,7 @@ public class DownloadFileCommand extends Command {
 			}
 			System.out.println("Type computer number for file downloading:");
 			int index;
-			Scanner scanner = CustomScanner.scanner;
+			Scanner scanner = Client.scanner;
 			while (true) {
 				if (scanner.hasNextInt()) {
 					index = scanner.nextInt() - 1;
@@ -63,33 +62,36 @@ public class DownloadFileCommand extends Command {
 	}
 
 	private static void downloadFile(final String ip, String fileName) throws IOException {
-		try (Socket socket = new Socket(ip, 6667);) {
+		try (Socket socket = new Socket(ip, Constant.CLIENTPORT);) {
 			ObjectOutputStream socketOutput = new ObjectOutputStream(socket.getOutputStream());
-			socketOutput.writeUTF("download");
+			socketOutput.writeUTF(Constant.DOWNLOAD);
 			socketOutput.writeUTF(fileName);
 			socketOutput.flush();
 			final InputStream is = socket.getInputStream();
 			final ObjectInputStream in = new ObjectInputStream(is);
-			final int fileSize = in.readInt();
+			final String msg = in.readUTF();
+			System.out.println(msg);
+			if (msg.equals("download")) {
+				final int fileSize = in.readInt();
 
-			final byte[] mybytearray = new byte[fileSize];
+				final byte[] mybytearray = new byte[fileSize];
 
-			final OutputStream fos = new FileOutputStream(fileName);
-			try (final BufferedOutputStream bos = new BufferedOutputStream(fos);) {
-				int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-				int current = bytesRead;
+				final OutputStream fos = new FileOutputStream(fileName);
+				try (final BufferedOutputStream bos = new BufferedOutputStream(fos);) {
+					int bytesRead = is.read(mybytearray, 0, mybytearray.length);
+					int current = bytesRead;
 
-				do {
-					bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
-					if (bytesRead > 0) {
-						current += bytesRead;
-					}
-				} while (bytesRead > 0);
+					do {
+						bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
+						if (bytesRead > 0) {
+							current += bytesRead;
+						}
+					} while (bytesRead > 0);
 
-				bos.write(mybytearray, 0, current);
-				bos.flush();
+					bos.write(mybytearray, 0, current);
+					bos.flush();
+				}
 			}
 		}
 	}
-
 }
