@@ -43,17 +43,14 @@ public class PeerActions implements Runnable {
 		final File file = new File(getAbsolutePath(fileName));
 		System.out.println(file.getName());
 		final InputStream fis = new FileInputStream(file);
-		try (final OutputStream sout = socket.getOutputStream(); final BufferedInputStream bis = new BufferedInputStream(fis);) {
+		try (final OutputStream sout = socket.getOutputStream();
+				final BufferedInputStream bis = new BufferedInputStream(fis);) {
 			final ObjectOutputStream out = new ObjectOutputStream(sout);
-			if (file.length() > Integer.MAX_VALUE) {
-				out.writeUTF("Pls choose < 4Gb file");
-			} else {
-				out.writeUTF("download");
-				out.writeInt((int) file.length());
-				out.flush();
-				IOUtils.copy(bis,sout);
-				sout.flush();
-			}
+			out.writeUTF("download");
+			out.flush();
+			IOUtils.copy(bis, sout);
+			sout.flush();
+
 		}
 	}
 }
