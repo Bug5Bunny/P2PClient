@@ -1,4 +1,4 @@
-# P2PServer
+# P2PClient
 1. Open P2PServer
 2. Open "bin" directory and run server.sh
 3. Create folder in your user home directory and name it "share"
