@@ -33,6 +33,7 @@ public class DownloadFileService implements Service {
 			if (Constant.DOWNLOAD.equals(msg)) {
 				final int fileSize = in.readInt();
 				final byte[] mybytearray = new byte[fileSize];
+
 				final OutputStream fos = new FileOutputStream(fileName);
 				try (final BufferedOutputStream bos = new BufferedOutputStream(fos);) {
 					int bytesRead = is.read(mybytearray, 0, mybytearray.length);

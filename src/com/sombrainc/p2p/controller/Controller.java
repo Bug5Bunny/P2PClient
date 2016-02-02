@@ -39,7 +39,6 @@ public class Controller {
 			}
 		}
 	}
-	
 	public void downloadMenu() {
 		try {
 			String[] ipAddresses = new String[0];
