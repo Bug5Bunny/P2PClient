@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import com.sombrainc.p2p.controller.Controller;
-import com.sombrainc.p2p.server.ServerThread;
+import com.sombrainc.p2p.server.PeerThread;
 import com.sombrainc.p2p.service.impl.ConnectService;
 
 public class Client {
@@ -13,7 +13,7 @@ public class Client {
 	private static final ConnectService connectCommand = new ConnectService();
 
 	public static void main(String[] args) throws IOException {
-		new Thread(new ServerThread()).start();
+		new Thread(new PeerThread()).start();
 		connectCommand.execute();
 		new Controller().menu();
 	}

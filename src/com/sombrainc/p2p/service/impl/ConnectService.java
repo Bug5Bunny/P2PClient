@@ -8,7 +8,7 @@ import java.net.Socket;
 import com.sombrainc.p2p.service.Service;
 import com.sombrainc.p2p.util.Constant;
 
-public class ConnectService extends Service {
+public class ConnectService implements Service {
 
 	@Override
 	public void execute() throws IOException {
